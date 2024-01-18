@@ -13,6 +13,16 @@ dotenv.config({
 
 connectDB()
 
+// when database is connected through async function then promise is returned 
+.then( ()=>{
+    app.listen(process.env.PORT || 8000, ()=>{
+        console.log(`Server is running at Port: ${process.env.PORT}`);
+    })
+})
+.catch((err)=>{
+    console.log("Mongo Db connection failed !!!", err)
+})
+
 
 
 
@@ -24,6 +34,8 @@ connectDB()
 // ( async () =>{
 //     try{
 //     await  mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
+
+//    this is a part of express 
 //     app.on("error", ()=>{
 //         console.log("ERR: ", error);
 //         throw error
@@ -36,3 +48,4 @@ connectDB()
 //     throw err
 //     }
 // }) ()
+
