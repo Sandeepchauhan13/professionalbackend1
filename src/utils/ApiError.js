@@ -1,5 +1,5 @@
 class ApiError extends Error{
-    // constructor and constructor override 
+    // constructor and super for  override 
     constructor(
      statusCode,
      message = "Something went wrong",
