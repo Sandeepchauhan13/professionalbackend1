@@ -1,5 +1,5 @@
 import {v2 as cloudanary} from "cloudinary";
-// fs is filesystem it is not uploaded automatically 
+// fs is filesystem it is not uploaded automatically not to be installed nodejs main hota hai
 import fs from "fs";
 
 
@@ -15,6 +15,7 @@ cloudinary.config({
 
 const uploadOnCloudinary = async (localFilePath) => {
     try{
+        // agar filepath nahi hai to return nulll (muje nahi pta karna hai )
 if (!localFilePath) return null
 //upload the file on cloudinary
 const response = await cloudinary.uploader.upload(localFilePath, {
@@ -25,6 +26,7 @@ const response = await cloudinary.uploader.upload(localFilePath, {
 console.log("file is uploaded on cloudinary", response.url);
 return response;
     }catch(error){
+        // safe cleaning purpose remove the file from server use fs.unlinksync 
 fs.unlinkSync(localFilePath) //remove the locally saved temporary file as the upload operation got failed 
 return null;
     }
