@@ -23,18 +23,13 @@ const userSchema = new Schema(
         
         },
 
-       username: {
+       fullName: {
         type: String,
         required: true,
         trim:  true,
         index: true
     },
-    username: {
-        type: String,
-        required: true,
-        trim:  true,
-        index: true
-    },
+    
     avatar: {
         // cloudanary url use karenge, aws like service cloudanary where we can save images 
         type: String,
@@ -72,7 +67,7 @@ userSchema.pre("save", async function (next) {
     // make changes only when password modified or not 
     if(!this.isModified("password")) return next();
     // salt or hash round is 10 e.g 8 or default also can be given 
-    this.password = bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password, 10)
     next()
 })
 
