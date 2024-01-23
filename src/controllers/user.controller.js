@@ -45,7 +45,8 @@ const existedUser = User.findOne({
 if (existedUser){
     throw new ApiError(409, "User with email or username already exists ")
 }
-// localpath of avatar and cover image 
+// localpath of avatar and cover image avatar local path is mandatory 
+// req.files from   multer // check for images , check for avatar
 const avatarLocalPath = req.files?.avatar[0]?.path;
  const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
@@ -61,6 +62,7 @@ const coverImage = await uploadOnCloudinary
 if(!avatar){
     throw new ApiError(400, "Avatar  file is required")
 }
+ // create user object - create entry in db 
 const user = await User.create({
     fullName,
     avatar: avatar.url,
@@ -69,6 +71,8 @@ const user = await User.create({
      password,
      username: username.toLowerCase()
 })
+
+// check for user creation & remove password and refresh token field from response
 const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
 )
