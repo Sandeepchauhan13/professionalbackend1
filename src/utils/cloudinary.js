@@ -1,4 +1,4 @@
-import {v2 as cloudanary} from "cloudinary";
+import {v2 as cloudinary} from "cloudinary";
 // fs is filesystem it is not uploaded automatically not to be installed nodejs main hota hai
 import fs from "fs";
 
@@ -23,7 +23,8 @@ const response = await cloudinary.uploader.upload(localFilePath, {
     resource_type: "auto"
 })
 // file has been uploaded successfully 
-console.log("file is uploaded on cloudinary", response.url);
+// console.log("file is uploaded on cloudinary", response.url);
+fs.unlinkSync(localFilePath)
 return response;
     }catch(error){
         // safe cleaning purpose remove the file from server use fs.unlinksync 
