@@ -3,6 +3,21 @@ import {ApiError} from "../utils/ApiError.js";
 import {User} from "../models/user.model.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+
+const generateAccessAndRefreshTokens = async(userId)=>{
+    try{
+       const user =  await User.findById(userId)
+    //    generate access token and generate refresh token are methods 
+
+      const accessToken =  user.generateAccessToken ()
+       const refreshToken = user.generateRefreshToken()
+       user.refreshToken = refreshToken
+          await user.save({validateBeforeSave: false})
+          return {accessToken, refreshToken}
+    }catch(error){
+        throw  new ApiError(500, "Something went wrong while generating refresh and access token")
+    }
+}
 const registerUser = asyncHandler (async (req, res)=>{
     // res ka status json response 
 //    return res.status(200).json({
@@ -51,10 +66,10 @@ if (existedUser){
 const avatarLocalPath = req.files?.avatar[0]?.path;
 //  const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
-// "coverImage": "", coverimage ess tareke se aayegi by this code
+// here some times error occures due to ?  mark"coverImage": "", coverimage ess tareke se aayegi by this code
  let coverImageLocalPath;
  if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
-      coverImageLocalPath = req.files.coverImage[0]?.path;
+      coverImageLocalPath = req.files.coverImage[0].path
  }
 
  if(!avatarLocalPath){
@@ -93,5 +108,47 @@ return res.status(201).json(
 
 })
 
+const loginUser = asyncHandler(async (req, res)=>{
+  // req body -> data
+  // check for username or email 
+  // find the user
+  // password check
+  // access and refresh token
+  // send cookie 
+  
+//  step1  req.body is data 
+  const {email, username, password}= req.body
 
-export {registerUser,}
+//   step2 check for username or email 
+  if(!username || !email){
+    throw new ApiError(400, "username or email is required")
+  }
+//   step 3 find the user 
+  const user = await User.findOne({
+    $or: [{username}, {email}]
+  })
+  if(!user){
+    throw new ApiError(404, "User does not exist ")
+  }
+
+  
+// #step4 password check 
+ const isPasswordValid =  await user.isPasswordCorrect(password)
+ if(!isPasswordValid){
+    throw new ApiError(401, "Invalid user credentials")
+ }
+
+// step 5 access and refreshtoken 
+const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id)
+
+const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+// httpOnly: true and secure: true modify from the server only not from front end 
+const options = {
+    httpOnly: true,
+    secure: true
+}
+return res.status(200).cookie("accessToken", accessToken, options).cookie
+})
+
+
+export {registerUser, loginUser}

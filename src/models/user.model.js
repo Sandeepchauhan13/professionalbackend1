@@ -78,6 +78,7 @@ userSchema.methods.isPasswordCorrect = async function (password){
 
 // jwt is a bearer token ye token jiske paas hai usko data send kar deta hai is like a key
 // generate access and refresh token 
+// access token is short lived where as refresh token is long lived 
 userSchema.methods.generateAccessToken = function() {
     // jwt ke paas ek sign method hai which generate token 
 return jwt.sign(
